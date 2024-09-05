@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"net/http"
+	"strings"
 	"sync"
 )
 
@@ -49,7 +52,30 @@ func (s *MemStorage) IncCounter(name string, value int64) {
 	}
 }
 
-// Check if POST
+// Update Metrtics
+// http://<АДРЕС_СЕРВЕРА>/update/<ТИП_МЕТРИКИ>/<ИМЯ_МЕТРИКИ>/<ЗНАЧЕНИЕ_МЕТРИКИ>
+func (s *Server) UpdateMetrics(res http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodPost {
+		http.Error(res, "Only POST method", http.StatusMethodNotAllowed)
+	}
+	urlPathString := strings.Split(req.URL.Path, "/")
+	if len(urlPathString) != 5 {
+		http.Error(res, "Incoreect URL", http.StatusNotFound)
+	} else {
+		io.WriteString(res, "All good\r\n")
+	}
+
+	metricType := urlPathString[2]
+
+	if metricType != "gauge" && metricType != "counter" {
+		http.Error(res, "Wrong metric type", http.StatusNotFound)
+	} else {
+		res.WriteHeader(http.StatusOK)
+	}
+	// metricName := urlPathString[4]
+	// metricValue := urlPathString[5]
+
+}
 
 // Request data http://<URL>/update/<metric_type>/<metric_name>/<metric_value>
 // Content-Type: text/plain
@@ -60,7 +86,22 @@ func (s *MemStorage) IncCounter(name string, value int64) {
 
 // ---Warning--- Not use redirects
 
+type Server struct {
+	storage *MemStorage
+}
+
+func NewServer(storage *MemStorage) *Server {
+	return &Server{storage: storage}
+}
+
 // Just main
 func main() {
+	storage := NewMemStorage()
+	server := NewServer(storage)
 	fmt.Println()
+	http.HandleFunc("/update/", server.UpdateMetrics)
+
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		fmt.Println("Err")
+	}
 }
