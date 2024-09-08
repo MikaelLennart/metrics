@@ -14,7 +14,7 @@ import (
 type gauge float64
 type counter int64
 
-// Metrics ...
+// Metrics ... for
 type Metrics struct {
 	gauges         map[string]gauge
 	counters       map[string]counter
