@@ -112,14 +112,10 @@ func (m *Metrics) GetMetrics() {
 // MetricsPolling every 2 sec ...
 func (m *Metrics) StartMetricsPolling() {
 	ticker := time.NewTicker(m.pollInterval)
-	go func() {
-		for {
-			select {
-			case <-ticker.C:
-				m.GetMetrics()
-			}
-		}
-	}()
+	defer ticker.Stop()
+	for range ticker.C {
+		m.GetMetrics()
+	}
 }
 
 // SendMetrics by HTTP / method POST ...
@@ -138,14 +134,15 @@ func (m *Metrics) SendMetric(metricType, name string, value interface{}) {
 func (m *Metrics) ReportMetrics() {
 	ticker := time.NewTicker(m.reportInterval)
 	defer ticker.Stop()
-
 	for range ticker.C {
 
 		for name, value := range m.gauges {
 			m.SendMetric("gauge", name, value)
+			time.Sleep((100 * time.Millisecond))
 		}
 		for name, value := range m.counters {
 			m.SendMetric("counter", name, value)
+			time.Sleep((100 * time.Millisecond))
 		}
 	}
 }
@@ -153,8 +150,9 @@ func (m *Metrics) ReportMetrics() {
 // Main ...
 func main() {
 	m := NewMetrics()
-	m.StartMetricsPolling()
+	go m.StartMetricsPolling()
 
 	go m.ReportMetrics()
+
 	select {}
 }
