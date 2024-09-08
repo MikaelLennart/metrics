@@ -40,11 +40,3 @@ func (s *MemStorage) IncCounter(name string, value int64) {
 		s.Counter[name] = value
 	}
 }
-
-// func (s *MemStorage) GetAllMetrics() {
-// 	s.mu.Lock()
-// 	defer s.mu.RLocker().Unlock()
-// 	for key, value := range s.Gauge {
-// 		io.WriteString(res, )
-// 	}
-// }

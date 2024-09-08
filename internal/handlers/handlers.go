@@ -1,4 +1,4 @@
-package serverHandlers
+package handlers
 
 import (
 	"fmt"
