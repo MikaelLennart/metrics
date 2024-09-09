@@ -11,12 +11,6 @@ type MemStorage struct {
 	Counter map[string]int64
 }
 
-// type MetricsStorage interface {
-// 	SetGauge(name string, value float64)
-// 	IncCounter(name string, value int64)
-// 	// GetMetrics()
-// }
-
 // NewMemStorage ...
 func NewMemStorage() *MemStorage {
 	return &MemStorage{

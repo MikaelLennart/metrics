@@ -19,8 +19,8 @@ all: runserver runagent
 
 runtests:
 	metricstest -test.v -test.run=^TestIteration2[AB]*$ \
-            -source-path=. \
-            -agent-binary-path=cmd/agent/agent
+                    -source-path=. \
+                    -agent-binary-path=cmd/agent/agent
 
 .PHONY: 
 	runserver runagent all
