@@ -96,6 +96,6 @@ func GetAllMetrics(s *store.MemStorage) http.HandlerFunc {
 // Router validation ...
 func IsNotValidRequestURL() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		http.Error(w, "Bad Request: missing type, name, or value", http.StatusBadRequest)
+		http.Error(w, "StatusNotFound", http.StatusNotFound)
 	}
 }
