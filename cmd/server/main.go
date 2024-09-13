@@ -1,22 +1,23 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 
-	"github.com/MikaelLennart/metrics.git/internal/handlers"
+	"github.com/MikaelLennart/metrics.git/internal/router"
 	"github.com/MikaelLennart/metrics.git/internal/store"
 )
 
-// Main ...
+// Server Main ...
 func main() {
-	storage := store.NewMemStorage()
-	mux := http.NewServeMux()
-	mux.HandleFunc("/update/", handlers.UpdateMetrics(storage))
-	mux.HandleFunc("/metrics", handlers.CheckMetrics(storage))
+	address := flag.String("a", "localhost:8080", "server port adress")
+	flag.Parse()
+	port := "" + *address
+	s := store.NewMemStorage()
+	r := router.NewRouter(s)
 
-	fmt.Println("Server started ... at :8080")
-	if err := http.ListenAndServe(":8080", mux); err != nil {
-		fmt.Println("Err")
-	}
+	fmt.Printf("Server started at %s\r\n", port)
+	http.ListenAndServe(port, r)
+
 }
