@@ -50,12 +50,12 @@ func TestUpdateMetrics(t *testing.T) {
 			url:                "/update/invalidType/testMetric/42",
 			expectedStatusCode: http.StatusBadRequest,
 		},
-		// {
-		// 	name:               "Missing value",
-		// 	requestBody:        "",
-		// 	url:                "/update/gauge/some/",
-		// 	expectedStatusCode: http.StatusBadRequest,
-		// },
+		{
+			name:               "Missing value",
+			requestBody:        "",
+			url:                "/update/gauge/some/",
+			expectedStatusCode: http.StatusNotFound,
+		},
 	}
 
 	for _, tc := range tests {

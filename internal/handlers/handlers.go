@@ -12,35 +12,39 @@ import (
 
 // Server UpdateMetrics ... Chi..v5
 func UpdateMetrics(s *store.MemStorage) http.HandlerFunc {
-	return func(res http.ResponseWriter, req *http.Request) {
+	return func(rw http.ResponseWriter, r *http.Request) {
 		// log.Printf("Request: %s %s", req.Method, req.URL.Path)
-		metricType := chi.URLParam(req, "type")
-		metricName := chi.URLParam(req, "name")
-		metricValueString := chi.URLParam(req, "value")
+		metricType := chi.URLParam(r, "type")
+		metricName := chi.URLParam(r, "name")
+		metricValueString := chi.URLParam(r, "value")
+
+		if metricValueString == "" {
+			http.Error(rw, "Missing metric value", http.StatusBadRequest)
+		}
 
 		switch metricType {
 		case "gauge":
 			// log.Printf("#gauge\r\n")
 			metricValue, err := strconv.ParseFloat(metricValueString, 64)
 			if err != nil {
-				http.Error(res, "Value do not match", http.StatusBadRequest)
+				http.Error(rw, "Value do not match", http.StatusBadRequest)
 				return
 			}
 			s.SetGauge(metricName, metricValue)
-			res.WriteHeader(http.StatusOK)
+			rw.WriteHeader(http.StatusOK)
 			// log.Printf("200 : StatusOK")
 		case "counter":
 			// log.Printf("#counter\r\n")
 			metricValue, err := strconv.ParseInt(metricValueString, 0, 64)
 			if err != nil {
-				http.Error(res, "Wrong counter value", http.StatusBadRequest)
+				http.Error(rw, "Wrong counter value", http.StatusBadRequest)
 				return
 			}
 			s.IncCounter(metricName, metricValue)
-			res.WriteHeader(http.StatusOK)
+			rw.WriteHeader(http.StatusOK)
 			// log.Printf("200 : StatusOK")
 		default:
-			http.Error(res, "Wrong metric type", http.StatusBadRequest)
+			http.Error(rw, "Wrong metric type", http.StatusBadRequest)
 		}
 
 	}

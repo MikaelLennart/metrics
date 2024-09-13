@@ -79,43 +79,43 @@ type MetricService interface {
 }
 
 // GetMetrics ...
-func (m *MemStorage) GetMetrics() {
+func (s *MemStorage) GetMetrics() {
 	var ms runtime.MemStats
 	runtime.ReadMemStats(&ms)
 
-	m.Gauges["Alloc"] = Gauge(ms.Alloc)
-	m.Gauges["GCCPUFraction"] = Gauge(ms.GCCPUFraction)
-	m.Gauges["GCSys"] = Gauge(ms.GCSys)
-	m.Gauges["Frees"] = Gauge(ms.Frees)
-	m.Gauges["HeapAlloc"] = Gauge(ms.HeapAlloc)
-	m.Gauges["BuckHashSys"] = Gauge(ms.BuckHashSys)
-	m.Gauges["HeapIdle"] = Gauge(ms.HeapIdle)
-	m.Gauges["HeapInuse"] = Gauge(ms.HeapInuse)
-	m.Gauges["HeapObjects"] = Gauge(ms.HeapObjects)
-	m.Gauges["HeapReleased"] = Gauge(ms.HeapReleased)
-	m.Gauges["HeapSys"] = Gauge(ms.HeapSys)
-	m.Gauges["LastGC"] = Gauge(ms.LastGC)
-	m.Gauges["Lookups"] = Gauge(ms.Lookups)
-	m.Gauges["MCacheInuse"] = Gauge(ms.MCacheInuse)
-	m.Gauges["MCacheSys"] = Gauge(ms.MCacheSys)
-	m.Gauges["MSpanInuse"] = Gauge(ms.MSpanInuse)
-	m.Gauges["MSpanSys"] = Gauge(ms.MSpanSys)
-	m.Gauges["Mallocs"] = Gauge(ms.Mallocs)
-	m.Gauges["NextGC"] = Gauge(ms.NextGC)
-	m.Gauges["NumForcedGC"] = Gauge(ms.NumForcedGC)
-	m.Gauges["NumGC"] = Gauge(ms.NumGC)
-	m.Gauges["OtherSys"] = Gauge(ms.OtherSys)
-	m.Gauges["PauseTotalNs"] = Gauge(ms.PauseTotalNs)
-	m.Gauges["StackInuse"] = Gauge(ms.StackInuse)
-	m.Gauges["StackSys"] = Gauge(ms.StackSys)
-	m.Gauges["Sys"] = Gauge(ms.Sys)
-	m.Gauges["TotalAlloc"] = Gauge(ms.TotalAlloc)
-	m.Gauges["RandomValue"] = Gauge(rand.Float64())
+	s.Gauges["Alloc"] = Gauge(ms.Alloc)
+	s.Gauges["GCCPUFraction"] = Gauge(ms.GCCPUFraction)
+	s.Gauges["GCSys"] = Gauge(ms.GCSys)
+	s.Gauges["Frees"] = Gauge(ms.Frees)
+	s.Gauges["HeapAlloc"] = Gauge(ms.HeapAlloc)
+	s.Gauges["BuckHashSys"] = Gauge(ms.BuckHashSys)
+	s.Gauges["HeapIdle"] = Gauge(ms.HeapIdle)
+	s.Gauges["HeapInuse"] = Gauge(ms.HeapInuse)
+	s.Gauges["HeapObjects"] = Gauge(ms.HeapObjects)
+	s.Gauges["HeapReleased"] = Gauge(ms.HeapReleased)
+	s.Gauges["HeapSys"] = Gauge(ms.HeapSys)
+	s.Gauges["LastGC"] = Gauge(ms.LastGC)
+	s.Gauges["Lookups"] = Gauge(ms.Lookups)
+	s.Gauges["MCacheInuse"] = Gauge(ms.MCacheInuse)
+	s.Gauges["MCacheSys"] = Gauge(ms.MCacheSys)
+	s.Gauges["MSpanInuse"] = Gauge(ms.MSpanInuse)
+	s.Gauges["MSpanSys"] = Gauge(ms.MSpanSys)
+	s.Gauges["Mallocs"] = Gauge(ms.Mallocs)
+	s.Gauges["NextGC"] = Gauge(ms.NextGC)
+	s.Gauges["NumForcedGC"] = Gauge(ms.NumForcedGC)
+	s.Gauges["NumGC"] = Gauge(ms.NumGC)
+	s.Gauges["OtherSys"] = Gauge(ms.OtherSys)
+	s.Gauges["PauseTotalNs"] = Gauge(ms.PauseTotalNs)
+	s.Gauges["StackInuse"] = Gauge(ms.StackInuse)
+	s.Gauges["StackSys"] = Gauge(ms.StackSys)
+	s.Gauges["Sys"] = Gauge(ms.Sys)
+	s.Gauges["TotalAlloc"] = Gauge(ms.TotalAlloc)
+	s.Gauges["RandomValue"] = Gauge(rand.Float64())
 
-	if val, exists := m.Counters["PollCount"]; exists {
-		m.Counters["PollCount"] = val + 1
+	if val, exists := s.Counters["PollCount"]; exists {
+		s.Counters["PollCount"] = val + 1
 	} else {
-		m.Counters["PollCount"] = 1
+		s.Counters["PollCount"] = 1
 	}
 }
 
