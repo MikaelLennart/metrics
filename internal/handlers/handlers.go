@@ -1,7 +1,8 @@
 package handlers
 
 import (
-	"log"
+	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -12,15 +13,14 @@ import (
 // Server UpdateMetrics ... Chi..v5
 func UpdateMetrics(s *store.MemStorage) http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		log.Printf("Request: %s %s", req.Method, req.URL.Path)
-
+		// log.Printf("Request: %s %s", req.Method, req.URL.Path)
 		metricType := chi.URLParam(req, "type")
 		metricName := chi.URLParam(req, "name")
 		metricValueString := chi.URLParam(req, "value")
 
 		switch metricType {
 		case "gauge":
-			log.Printf("Case gauge\r\n")
+			// log.Printf("#gauge\r\n")
 			metricValue, err := strconv.ParseFloat(metricValueString, 64)
 			if err != nil {
 				http.Error(res, "Value do not match", http.StatusBadRequest)
@@ -28,9 +28,9 @@ func UpdateMetrics(s *store.MemStorage) http.HandlerFunc {
 			}
 			s.SetGauge(metricName, metricValue)
 			res.WriteHeader(http.StatusOK)
-
+			// log.Printf("200 : StatusOK")
 		case "counter":
-			log.Printf("Case gauge\r\n")
+			// log.Printf("#counter\r\n")
 			metricValue, err := strconv.ParseInt(metricValueString, 0, 64)
 			if err != nil {
 				http.Error(res, "Wrong counter value", http.StatusBadRequest)
@@ -38,12 +38,60 @@ func UpdateMetrics(s *store.MemStorage) http.HandlerFunc {
 			}
 			s.IncCounter(metricName, metricValue)
 			res.WriteHeader(http.StatusOK)
+			// log.Printf("200 : StatusOK")
 		default:
 			http.Error(res, "Wrong metric type", http.StatusBadRequest)
 		}
 
-		if metricName == "" {
-			http.Error(res, "Missing metric name", http.StatusBadRequest)
+	}
+}
+
+// Get Metric by name...
+func GetMetricByName(s *store.MemStorage) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		metricType := chi.URLParam(r, "metricType")
+		metricName := chi.URLParam(r, "metricName")
+
+		switch metricType {
+		case "gauge":
+			if _, exists := s.Gauges[metricName]; exists {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(fmt.Sprintf("%v\r\n", s.Gauges[metricName])))
+			} else {
+				http.Error(w, "Metric not fount", http.StatusNotFound)
+			}
+		case "counter":
+			if _, exists := s.Counters[metricName]; exists {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(fmt.Sprintf("%v\r\n", s.Counters[metricName])))
+			} else {
+				http.Error(w, "Metric not fount", http.StatusNotFound)
+			}
+
 		}
+	}
+}
+
+// GetMetrics ...
+func GetAllMetrics(s *store.MemStorage) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		io.WriteString(w, "Gauge metrics:\r\n")
+		for key, value := range s.Gauges {
+			w.Write([]byte(fmt.Sprintf("Key: %v Value: %v\r\n", key, value)))
+		}
+		io.WriteString(w, "Countetr metrics:\r\n")
+		for key, value := range s.Counters {
+			w.Write([]byte(fmt.Sprintf("Key: %v Value: %v\r\n", key, value)))
+		}
+
+	}
+}
+
+// Router validation ...
+func IsNotValidRequestURL() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "Bad Request: missing type, name, or value", http.StatusBadRequest)
 	}
 }

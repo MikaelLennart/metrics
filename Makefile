@@ -4,6 +4,8 @@ runserver:
 runagent: 
 	go run ./cmd/agent/main.go
 
+runall: runserver runagent
+
 buildserver:
 	go build -o ./cmd/server/server ./cmd/server/main.go
 
@@ -18,9 +20,10 @@ buildall: buildagent buildserver
 all: runserver runagent
 
 runtests:
-	metricstest -test.v -test.run=^TestIteration2[AB]*$ \
+	metricstest -test.v -test.run=^TestIteration3[AB]*$ \
                     -source-path=. \
-                    -agent-binary-path=cmd/agent/agent
+                    -agent-binary-path=cmd/agent/agent \
+                    -binary-path=cmd/server/server
 
 .PHONY: 
 	runserver runagent all

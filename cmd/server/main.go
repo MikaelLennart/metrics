@@ -1,21 +1,23 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 
-	"github.com/MikaelLennart/metrics.git/internal/handlers"
+	"github.com/MikaelLennart/metrics.git/internal/router"
 	"github.com/MikaelLennart/metrics.git/internal/store"
-	"github.com/go-chi/chi/v5"
 )
 
-// Main ...
+// Server Main ...
 func main() {
-	storage := store.NewMemStorage()
-	r := chi.NewRouter()
+	address := flag.String("a", "8080", "server port adress")
+	flag.Parse()
+	port := ":" + *address
+	s := store.NewMemStorage()
+	r := router.NewRouter(s)
 
-	r.Post("/update/{type}/{name}/{value}", handlers.UpdateMetrics(storage))
+	fmt.Printf("Server started at %s\r\n", port)
+	http.ListenAndServe(port, r)
 
-	fmt.Println("Server started ... at :8080")
-	http.ListenAndServe(":8080", r)
 }
