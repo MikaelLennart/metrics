@@ -11,7 +11,7 @@ import (
 func NewRouter(storage *store.MemStorage) http.Handler {
 	r := chi.NewRouter()
 	// POST http://<HOST>/update/<metricType>/metricName/metricName
-	r.Route("/{update}", func(r chi.Router) {
+	r.Route("/update", func(r chi.Router) {
 		r.Post("/*", handlers.IsNotValidRequestURL())
 		r.Post("/{type}/{name}/{value}", handlers.UpdateMetrics(storage))
 	})

@@ -36,7 +36,7 @@ func TestUpdateMetrics(t *testing.T) {
 			name:               "Update gauge Invalid value",
 			requestBody:        "",
 			url:                "/update/gauge/testMetric/xxxx",
-			expectedStatusCode: http.StatusNotFound,
+			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
 			name:               "Update countert IsOK",
@@ -54,6 +54,12 @@ func TestUpdateMetrics(t *testing.T) {
 			name:               "Missing value",
 			requestBody:        "",
 			url:                "/update/gauge/some/",
+			expectedStatusCode: http.StatusNotFound,
+		},
+		{
+			name:               "Invalid request",
+			requestBody:        "",
+			url:                "/updater/counter/testCounter/100",
 			expectedStatusCode: http.StatusNotFound,
 		},
 	}

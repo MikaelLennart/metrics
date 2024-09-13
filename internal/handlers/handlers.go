@@ -14,13 +14,10 @@ import (
 func UpdateMetrics(s *store.MemStorage) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		// log.Printf("Request: %s %s", req.Method, req.URL.Path)
+
 		metricType := chi.URLParam(r, "type")
 		metricName := chi.URLParam(r, "name")
 		metricValueString := chi.URLParam(r, "value")
-
-		if metricValueString == "" {
-			http.Error(rw, "Missing metric value", http.StatusBadRequest)
-		}
 
 		switch metricType {
 		case "gauge":
