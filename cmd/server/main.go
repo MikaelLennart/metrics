@@ -11,9 +11,9 @@ import (
 
 // Server Main ...
 func main() {
-	address := flag.String("a", "8080", "server port adress")
+	address := flag.String("a", "localhost:8080", "server port adress")
 	flag.Parse()
-	port := ":" + *address
+	port := "" + *address
 	s := store.NewMemStorage()
 	r := router.NewRouter(s)
 

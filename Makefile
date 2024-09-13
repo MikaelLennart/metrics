@@ -20,14 +20,14 @@ buildall: buildagent buildserver
 all: runserver runagent
 
 runtests:
-	SERVER_PORT=$(random unused-port)
-                  ADDRESS="localhost:${9090}"
-                  TEMP_FILE=$(random tempfile)
-                  metricstest -test.v -test.run=^TestIteration4$ \
-                    -agent-binary-path=cmd/agent/agent \
-                    -binary-path=cmd/server/server \
-                    -server-port=$SERVER_PORT \
-                    -source-path=.
+	SERVER_PORT := 4343
+    ADDRESS := "localhost:${SERVER_PORT}"
+    TEMP_FILE := $(shell mktemp)
+    metricstest -test.v -test.run=^TestIteration4$ \
+    	-agent-binary-path=cmd/agent/agent \
+        -binary-path=cmd/server/server \
+        -server-port=$(SERVER_PORT) \
+        -source-path=.
 
 .PHONY: 
 	runserver runagent all

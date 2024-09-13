@@ -136,7 +136,7 @@ func (s *MemStorage) StartMetricsPolling(seconds int64) {
 
 // SendMetrics by HTTP / method POST ...
 func (s *MemStorage) SendMetric(metricType, name string, value interface{}, address string) {
-	url := fmt.Sprintf("http://localhost%s/update/%s/%s/%v", address, metricType, name, value)
+	url := fmt.Sprintf("http://%s/update/%s/%s/%v", address, metricType, name, value)
 	resp, err := http.Post(url, "text/plain", bytes.NewBuffer([]byte(fmt.Sprintf("%v", value))))
 	if err != nil {
 		fmt.Printf("Ошибка при отправке метрики: %v\n", err)
