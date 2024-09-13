@@ -119,8 +119,14 @@ func (s *MemStorage) GetMetrics() {
 	}
 }
 
-// MetricsPolling every 2 sec ...
-func (s *MemStorage) StartMetricsPolling() {
+// // Set Polling interval
+// func (s *MemStorage) SetPollingInterval(seconds int64) {
+// 	s.pollInterval = time.Duration(seconds) * time.Second
+// }
+
+// MetricsPolling every <seconds> ...
+func (s *MemStorage) StartMetricsPolling(seconds int64) {
+	s.pollInterval = time.Duration(seconds) * time.Second
 	ticker := time.NewTicker(s.pollInterval)
 	defer ticker.Stop()
 	for range ticker.C {
@@ -129,8 +135,8 @@ func (s *MemStorage) StartMetricsPolling() {
 }
 
 // SendMetrics by HTTP / method POST ...
-func (s *MemStorage) SendMetric(metricType, name string, value interface{}) {
-	url := fmt.Sprintf("http://localhost:8080/update/%s/%s/%v", metricType, name, value)
+func (s *MemStorage) SendMetric(metricType, name string, value interface{}, address string) {
+	url := fmt.Sprintf("http://localhost%s/update/%s/%s/%v", address, metricType, name, value)
 	resp, err := http.Post(url, "text/plain", bytes.NewBuffer([]byte(fmt.Sprintf("%v", value))))
 	if err != nil {
 		fmt.Printf("Ошибка при отправке метрики: %v\n", err)
@@ -140,18 +146,19 @@ func (s *MemStorage) SendMetric(metricType, name string, value interface{}) {
 	fmt.Printf("Метрика %s %s %v отправлена. Статус: %s\n", metricType, name, value, resp.Status)
 }
 
-// ReportMetrics every 5 sec ..
-func (s *MemStorage) ReportMetrics() {
+// ReportMetrics every <seconds> ...
+func (s *MemStorage) ReportMetrics(address string, seconds int64) {
+	s.reportInterval = time.Duration(seconds) * time.Second
 	ticker := time.NewTicker(s.reportInterval)
 	defer ticker.Stop()
 	for range ticker.C {
 
 		for name, value := range s.Gauges {
-			s.SendMetric("gauge", name, value)
+			s.SendMetric("gauge", name, value, address)
 			time.Sleep((100 * time.Millisecond))
 		}
 		for name, value := range s.Counters {
-			s.SendMetric("counter", name, value)
+			s.SendMetric("counter", name, value, address)
 			time.Sleep((100 * time.Millisecond))
 		}
 	}

@@ -20,10 +20,14 @@ buildall: buildagent buildserver
 all: runserver runagent
 
 runtests:
-	metricstest -test.v -test.run=^TestIteration3[AB]*$ \
-                    -source-path=. \
+	SERVER_PORT=$(random unused-port)
+                  ADDRESS="localhost:${9090}"
+                  TEMP_FILE=$(random tempfile)
+                  metricstest -test.v -test.run=^TestIteration4$ \
                     -agent-binary-path=cmd/agent/agent \
-                    -binary-path=cmd/server/server
+                    -binary-path=cmd/server/server \
+                    -server-port=$SERVER_PORT \
+                    -source-path=.
 
 .PHONY: 
 	runserver runagent all
