@@ -1,23 +1,25 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"net/http"
+	"os"
 
+	// "github.com/MikaelLennart/metrics.git/config"
+	"github.com/MikaelLennart/metrics.git/config"
 	"github.com/MikaelLennart/metrics.git/internal/router"
 	"github.com/MikaelLennart/metrics.git/internal/store"
 )
 
 // Server Main ...
 func main() {
-	address := flag.String("a", "localhost:8080", "server port adress")
-	flag.Parse()
-	port := "" + *address
+	LetServerAddress := os.Getenv("SERVER_ADDRESS")
+	fmt.Printf("Считанное значение SERVER_ADDRESS: [%s]\n", LetServerAddress)
+
+	cfg := config.ServerConfig()
 	s := store.NewMemStorage()
 	r := router.NewRouter(s)
-
-	fmt.Printf("Server started at %s\r\n", port)
-	http.ListenAndServe(port, r)
+	fmt.Printf("Server started at %s\r\n", cfg.ServerAddress)
+	http.ListenAndServe(cfg.ServerAddress, r)
 
 }

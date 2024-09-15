@@ -1,5 +1,13 @@
+# SERVER_ADDRESS := localhost:9999
+POLL_INTERVAL :=
+REPORT_INTERVAL :=
+SERVER_PORT := 4343
+ADDRESS := "localhost:${SERVER_PORT}"
+TEMP_FILE := $(shell mktemp)
+
+
 runserver: 
-	go run ./cmd/server/main.go
+	go run ./cmd/server/main.go 
 
 runagent: 
 	go run ./cmd/agent/main.go
@@ -20,10 +28,7 @@ buildall: buildagent buildserver
 all: runserver runagent
 
 runtests:
-	SERVER_PORT := 4343
-    ADDRESS := "localhost:${SERVER_PORT}"
-    TEMP_FILE := $(shell mktemp)
-    metricstest -test.v -test.run=^TestIteration4$ \
+	metricstest -test.v -test.run=^TestIteration5$ \
     	-agent-binary-path=cmd/agent/agent \
         -binary-path=cmd/server/server \
         -server-port=$(SERVER_PORT) \
