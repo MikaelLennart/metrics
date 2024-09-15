@@ -50,24 +50,23 @@ func AgentConfig() *Config {
 	if err := env.Parse(cfg); err != nil {
 		fmt.Printf("%+v\n", err)
 	}
+	serverAddress := flag.String("a", cfg.ServerAddress, "Server address")
+	pollInterval := flag.Int64("p", cfg.PollInterval, "Set Poll Interval in Seconds")
+	reportInterval := flag.Int64("r", cfg.ReportInterval, "Set Report Interval in Seconds")
+
+	flag.Parse()
 
 	if !cfg.ServerAddressEnvSet {
-		serverAddress := flag.String("a", cfg.ServerAddress, "Server address")
-		flag.Parse()
 		cfg.ServerAddress = *serverAddress
 		fmt.Println(*serverAddress)
 	}
 
 	if !cfg.PollIntervalEnvSet {
-		pollInterval := flag.Int64("p", cfg.PollInterval, "Set Poll Interval in Seconds")
-		flag.Parse()
 		cfg.PollInterval = *pollInterval
 		fmt.Println(*pollInterval)
 	}
 
 	if !cfg.ReportIntervalEnvSet {
-		reportInterval := flag.Int64("p", cfg.ReportInterval, "Set Report Interval in Seconds")
-		flag.Parse()
 		cfg.ReportInterval = *reportInterval
 		fmt.Println(*reportInterval)
 	}

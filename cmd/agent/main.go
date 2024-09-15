@@ -11,7 +11,7 @@ func main() {
 	cfg := config.AgentConfig()
 	s := store.NewMetrics()
 
-	go s.StartMetricsPolling(int64(cfg.PollInterval))
+	go s.StartMetricsPolling(cfg.PollInterval)
 	go s.ReportMetrics(cfg.ServerAddress, cfg.ReportInterval)
 
 	select {}
