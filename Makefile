@@ -2,7 +2,7 @@
 # POLL_INTERVAL := 1
 # REPORT_INTERVAL := 1
 SERVER_PORT := 4343
-ADDRESS := "localhost:${SERVER_PORT}"
+ADDRESS := localhost:${SERVER_PORT}
 TEMP_FILE := $(shell mktemp)
 
 

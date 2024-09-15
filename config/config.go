@@ -10,7 +10,7 @@ import (
 
 // Config struct ...
 type Config struct {
-	ServerAddress        string `env:"SERVER_ADDRESS" envDefault:"localhost:8080"`
+	ServerAddress        string `env:"ADDRESS" envDefault:"localhost:8080"`
 	PollInterval         int64  `env:"POLL_INTERVAL" envDefault:"2"`
 	ReportInterval       int64  `env:"REPORT_INTERVAL" envDefault:"10"`
 	ServerAddressEnvSet  bool
@@ -30,7 +30,7 @@ func ServerConfig() *Config {
 	if err := env.Parse(cfg); err != nil {
 		fmt.Printf("%+v\n", err)
 	}
-	cfg.ServerAddressEnvSet = checkEnvSet("SERVER_ADDRESS")
+	cfg.ServerAddressEnvSet = checkEnvSet("ADDRESS")
 	cfg.PollIntervalEnvSet = checkEnvSet("POLL_INTERVAL")
 	cfg.ReportIntervalEnvSet = checkEnvSet("REPORT_INTERVAL")
 
