@@ -3,20 +3,23 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 
-	"github.com/MikaelLennart/metrics.git/internal/handlers"
+	// "github.com/MikaelLennart/metrics.git/config"
+	"github.com/MikaelLennart/metrics.git/config"
+	"github.com/MikaelLennart/metrics.git/internal/router"
 	"github.com/MikaelLennart/metrics.git/internal/store"
 )
 
-// Main ...
+// Server Main ...
 func main() {
-	storage := store.NewMemStorage()
-	mux := http.NewServeMux()
-	mux.HandleFunc("/update/", handlers.UpdateMetrics(storage))
-	mux.HandleFunc("/metrics", handlers.CheckMetrics(storage))
+	LetServerAddress := os.Getenv("SERVER_ADDRESS")
+	fmt.Printf("Считанное значение SERVER_ADDRESS: [%s]\n", LetServerAddress)
 
-	fmt.Println("Server started ... at :8080")
-	if err := http.ListenAndServe(":8080", mux); err != nil {
-		fmt.Println("Err")
-	}
+	cfg := config.ServerConfig()
+	s := store.NewMemStorage()
+	r := router.NewRouter(s)
+	fmt.Printf("Server started at %s\r\n", cfg.ServerAddress)
+	http.ListenAndServe(cfg.ServerAddress, r)
+
 }

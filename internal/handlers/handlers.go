@@ -2,73 +2,97 @@ package handlers
 
 import (
 	"fmt"
-	"log"
+	"io"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/MikaelLennart/metrics.git/internal/store"
+	"github.com/go-chi/chi/v5"
 )
 
+// Server UpdateMetrics ... Chi..v5
 func UpdateMetrics(s *store.MemStorage) http.HandlerFunc {
-	return func(res http.ResponseWriter, req *http.Request) {
-		log.Printf("Request: %s %s", req.Method, req.URL.Path)
-		if req.Method != http.MethodPost {
-			http.Error(res, "Only POST method", http.StatusMethodNotAllowed)
-			return
-		}
-		urlPathString := strings.Split(req.URL.Path, "/")
-		if len(urlPathString) != 5 {
-			http.Error(res, "Incoreect URL", http.StatusNotFound)
-			return
-		}
-		metricType := urlPathString[2]
-		metricName := urlPathString[3]
-		metricValueString := urlPathString[4]
-		log.Printf("Metric Type: %s Metric Name: %s Metric Value: %s", metricType, metricName, metricValueString)
+	return func(rw http.ResponseWriter, r *http.Request) {
+		// log.Printf("Request: %s %s", req.Method, req.URL.Path)
+
+		metricType := chi.URLParam(r, "type")
+		metricName := chi.URLParam(r, "name")
+		metricValueString := chi.URLParam(r, "value")
+
 		switch metricType {
 		case "gauge":
-			log.Printf("Case gauge\r\n")
+			// log.Printf("#gauge\r\n")
 			metricValue, err := strconv.ParseFloat(metricValueString, 64)
 			if err != nil {
-				http.Error(res, "Value do not match", http.StatusBadRequest)
+				http.Error(rw, "Value do not match", http.StatusBadRequest)
 				return
 			}
 			s.SetGauge(metricName, metricValue)
-			res.WriteHeader(http.StatusOK)
-
+			rw.WriteHeader(http.StatusOK)
+			// log.Printf("200 : StatusOK")
 		case "counter":
-			log.Printf("Case gauge\r\n")
+			// log.Printf("#counter\r\n")
 			metricValue, err := strconv.ParseInt(metricValueString, 0, 64)
 			if err != nil {
-				http.Error(res, "Wrong counter value", http.StatusBadRequest)
+				http.Error(rw, "Wrong counter value", http.StatusBadRequest)
 				return
 			}
 			s.IncCounter(metricName, metricValue)
-			res.WriteHeader(http.StatusOK)
+			rw.WriteHeader(http.StatusOK)
+			// log.Printf("200 : StatusOK")
 		default:
-			http.Error(res, "Wrong metric type", http.StatusBadRequest)
+			http.Error(rw, "Wrong metric type", http.StatusBadRequest)
 		}
 
-		if metricName == "" {
-			http.Error(res, "Missing metric name", http.StatusBadRequest)
+	}
+}
+
+// Get Metric by name...
+func GetMetricByName(s *store.MemStorage) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		metricType := chi.URLParam(r, "metricType")
+		metricName := chi.URLParam(r, "metricName")
+
+		switch metricType {
+		case "gauge":
+			if _, exists := s.Gauges[metricName]; exists {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(fmt.Sprintf("%v\r\n", s.Gauges[metricName])))
+			} else {
+				http.Error(w, "Metric not fount", http.StatusNotFound)
+			}
+		case "counter":
+			if _, exists := s.Counters[metricName]; exists {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(fmt.Sprintf("%v\r\n", s.Counters[metricName])))
+			} else {
+				http.Error(w, "Metric not fount", http.StatusNotFound)
+			}
+
 		}
 	}
 }
 
-func CheckMetrics(s *store.MemStorage) http.HandlerFunc {
-	return func(res http.ResponseWriter, req *http.Request) {
+// GetMetrics ...
+func GetAllMetrics(s *store.MemStorage) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 
-		res.Header().Set("Content-Type", "text/plain")
-		log.Println("Handler checkMetrics")
-		for key, value := range s.Gauge {
-
-			_, err := fmt.Fprintf(res, "Gauge: %s: %v\r\n", key, value)
-			if err != nil {
-				http.Error(res, "Error", http.StatusFailedDependency)
-
-			}
+		io.WriteString(w, "Gauge metrics:\r\n")
+		for key, value := range s.Gauges {
+			w.Write([]byte(fmt.Sprintf("Key: %v Value: %v\r\n", key, value)))
+		}
+		io.WriteString(w, "Countetr metrics:\r\n")
+		for key, value := range s.Counters {
+			w.Write([]byte(fmt.Sprintf("Key: %v Value: %v\r\n", key, value)))
 		}
 
+	}
+}
+
+// Router validation ...
+func IsNotValidRequestURL() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "StatusNotFound", http.StatusNotFound)
 	}
 }
