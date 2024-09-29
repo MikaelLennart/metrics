@@ -73,10 +73,10 @@ func NewMetrics() *MemStorage {
 	}
 }
 
-// Metrics Service ...
-type MetricService interface {
-	GetMetrics()
-}
+// // Metrics Service ...
+// type MetricService interface {
+// 	GetMetrics()
+// }
 
 // GetMetrics ...
 func (s *MemStorage) GetMetrics() {
@@ -118,11 +118,6 @@ func (s *MemStorage) GetMetrics() {
 		s.Counters["PollCount"] = 1
 	}
 }
-
-// // Set Polling interval
-// func (s *MemStorage) SetPollingInterval(seconds int64) {
-// 	s.pollInterval = time.Duration(seconds) * time.Second
-// }
 
 // MetricsPolling every <seconds> ...
 func (s *MemStorage) StartMetricsPolling(seconds int64) {
